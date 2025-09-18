@@ -1,0 +1,17 @@
+services:
+  wa_server_prod:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "80:8000"
+
+  wa_server_dev:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - "8000:8000"
+    command: fastapi dev src/main.py --host 0.0.0.0
+    volumes:
+      - ./src:/app/src
