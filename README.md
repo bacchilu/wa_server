@@ -1,6 +1,6 @@
 # WhatsApp FastAPI Server
 
-Simple FastAPI wrapper around `pywa` to interact with the WhatsApp Cloud API.
+FastAPI service that surfaces WhatsApp Cloud API webhook verification and helper endpoints via raw Graph API requests—no `pywa` dependency required.
 
 ## Prerequisites
 
@@ -9,25 +9,36 @@ Simple FastAPI wrapper around `pywa` to interact with the WhatsApp Cloud API.
 
 ## Installation
 
-1. Install dependencies:
+1. (Optional) create and activate a virtual environment:
+   ```bash
+   python -m venv ENV
+   source ENV/bin/activate
+   ```
+2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-2. Create a `.env` file with your credentials:
+3. Create a `.env` file with the required credentials:
    ```bash
    TOKEN="<your_whatsapp_token>"
    PHONE_ID="<your_whatsapp_phone_id>"
    ```
 
-## Development
+Update `src/main.py` if you need to change the verification token (`XYZ123`) or the default recipient used by `/send_message`.
 
-Run the FastAPI dev server (reload enabled):
+## Running locally
+
+Start the FastAPI dev server with autoreload:
 
 ```bash
 fastapi dev src/main.py
 ```
 
-The server exposes the WhatsApp webhooks via the configured FastAPI instance.
+The app exposes three main endpoints:
+
+- `GET /` – handles the Meta webhook verification challenge and returns HTTP 403 when invalid.
+- `POST /` – logs incoming webhook payloads to stdout and responds with `200 OK`.
+- `GET /send_message` – sends a sample text message through the WhatsApp Cloud API using the configured credentials.
 
 ## Docker
 
@@ -58,13 +69,26 @@ docker compose up wa_server_prod
 docker compose up wa_server_dev
 ```
 
-### Sample request
+### Sample webhook payload
+
+Trigger the webhook handler with a dummy payload while the server runs:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/ \
   -H "Content-Type: application/json" \
   -d '{
-    "to": "+39XXXXXXXXXX",
-    "text": "Ciao, come stai? Ci sentiamo dopo."
+    "entry": [
+      {
+        "changes": [
+          {
+            "field": "messages",
+            "value": {
+              "metadata": { "phone_number_id": "YOUR_PHONE_ID" },
+              "messages": [{ "from": "SENDER", "text": { "body": "Ping" } }]
+            }
+          }
+        ]
+      }
+    ]
   }'
 ```
