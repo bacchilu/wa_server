@@ -1,3 +1,4 @@
+import logging
 import os
 
 import httpx
@@ -9,6 +10,11 @@ load_dotenv()
 
 TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
 PHONE_ID = os.getenv("PHONE_ID")
+VERIFICATION_TOKEN = os.getenv("VERIFICATION_TOKEN")
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 app = FastAPI()
@@ -25,22 +31,25 @@ def verify_webhook(
     challenge: str | None = Query(None, alias="hub.challenge"),
     token: str | None = Query(None, alias="hub.verify_token"),
 ):
-    if mode == "subscribe" and token == "XYZ123" and challenge is not None:
-        print("WEBHOOK VERIFIED")
+    if mode == "subscribe" and token == VERIFICATION_TOKEN and challenge is not None:
+        logger.info("Webhook verified")
         return challenge
     raise HTTPException(status_code=403)
 
 
 @app.post("/")
 async def webhook(request: Request):
-    print("\n\nWebhook received\n")
+    logger.debug("Webhook received")
 
     try:
         payload = await request.json()
-        print(payload)
+        logger.info("Webhook JSON payload: %s", payload)
     except Exception:
         raw = await request.body()
-        print(raw.decode("utf-8", errors="replace"))
+        logger.warning(
+            "Webhook payload not valid JSON; raw body: %s",
+            raw.decode("utf-8", errors="replace"),
+        )
     return Response(status_code=200)
 
 
