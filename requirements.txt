@@ -1,5 +1,3 @@
 fastapi[standard]
-pywa
-pywa[fastapi]
 python-dotenv
 httpx
