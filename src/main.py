@@ -1,16 +1,20 @@
+import json
 import logging
 import os
+from pprint import pformat
+from typing import Any
 
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import PlainTextResponse
 
+from wa import parse_notification_payload, verify_token
+
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
 PHONE_ID = os.getenv("PHONE_ID")
-VERIFICATION_TOKEN = os.getenv("VERIFICATION_TOKEN")
 
 
 logging.basicConfig(level=logging.INFO)
@@ -31,9 +35,10 @@ def verify_webhook(
     challenge: str | None = Query(None, alias="hub.challenge"),
     token: str | None = Query(None, alias="hub.verify_token"),
 ):
-    if mode == "subscribe" and token == VERIFICATION_TOKEN and challenge is not None:
+    verified_challenge = verify_token(mode, token, challenge)
+    if verified_challenge is not None:
         logger.info("Webhook verified")
-        return challenge
+        return verified_challenge
     raise HTTPException(status_code=403)
 
 
@@ -42,8 +47,9 @@ async def webhook(request: Request):
     logger.debug("Webhook received")
 
     try:
-        payload = await request.json()
-        logger.info("Webhook JSON payload: %s", payload)
+        payload: dict[str, Any] = await request.json()
+        logger.info("Webhook JSON payload:\n%s", json.dumps(payload, indent=4))
+        logger.info(pformat(parse_notification_payload(payload)))
     except Exception:
         raw = await request.body()
         logger.warning(
