@@ -24,7 +24,7 @@ FastAPI service that surfaces WhatsApp Cloud API webhook verification and helper
    PHONE_ID="<your_whatsapp_phone_id>"
    ```
 
-Update `src/main.py` if you need to change the verification token (`XYZ123`) or the default recipient used by `/send_message`.
+Update `src/main.py` if you need to change the verification token or the default recipient used by `/send_test_message`.
 
 ## Running locally
 
@@ -34,11 +34,12 @@ Start the FastAPI dev server with autoreload:
 fastapi dev src/main.py
 ```
 
-The app exposes three main endpoints:
+The app exposes these endpoints:
 
 - `GET /` – handles the Meta webhook verification challenge and returns HTTP 403 when invalid.
 - `POST /` – logs incoming webhook payloads to stdout and responds with `200 OK`.
-- `GET /send_message` – sends a sample text message through the WhatsApp Cloud API using the configured credentials.
+- `GET /send_test_message` – sends a sample text message through the WhatsApp Cloud API using the configured credentials.
+- `POST /send_message` – accepts JSON input and relays a custom WhatsApp message via the Cloud API.
 
 ## Docker
 
@@ -91,4 +92,14 @@ curl -X POST http://127.0.0.1:8000/ \
       }
     ]
   }'
+```
+
+### Sample `send_message` request
+
+Send a custom WhatsApp message using the POST endpoint (replace the credentials before running):
+
+```bash
+curl -X POST http://127.0.0.1:8000/send_message \
+  -H "Content-Type: application/json" \
+  -d '{"to":"+393474846411","body":"Ciao Luca, come stai?"}'
 ```

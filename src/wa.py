@@ -79,17 +79,14 @@ class WAError(Exception):
         return json.dumps(self.payload)
 
 
-async def send_message():
+async def send_message(to: str, body: str):
     url = f"https://graph.facebook.com/v23.0/{PHONE_ID}/messages"
     message_payload = {
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
-        "to": "+393474846411",
+        "to": to,
         "type": "text",
-        "text": {
-            "preview_url": True,
-            "body": "Nel mezzo del cammin di nostra vita\nMi ritrovai per una selva oscura\n\nhttps://github.com/bacchilu",
-        },
+        "text": {"preview_url": True, "body": body},
     }
 
     headers = {

@@ -5,6 +5,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import PlainTextResponse
+from pydantic import BaseModel
 
 import wa
 
@@ -15,9 +16,9 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 
-@app.get("/hello")
-async def read_root():
-    return {"Hello": "World"}
+class SendMessagePayload(BaseModel):
+    to: str
+    body: str
 
 
 @app.get("/", response_class=PlainTextResponse)
@@ -50,11 +51,27 @@ async def webhook(request: Request):
     return Response(status_code=200)
 
 
-@app.get("/send_message")
-async def send_message():
+@app.get("/send_test_message")
+async def send_test_message():
     try:
-        data = await wa.send_message()
+        data = await wa.send_message(
+            "+393474846411",
+            "Nel mezzo del cammin di nostra vita\nMi ritrovai per una selva oscura\n\nhttps://github.com/bacchilu",
+        )
     except wa.WAError as e:
         raise HTTPException(status_code=500, detail=e.payload)
-
     return data
+
+
+@app.post("/send_message")
+async def send_message(payload: SendMessagePayload):
+    try:
+        data = await wa.send_message(payload.to, payload.body)
+    except wa.WAError as e:
+        raise HTTPException(status_code=500, detail=e.payload)
+    return data
+
+
+@app.get("/hello")
+async def read_root():
+    return {"Hello": "World"}
