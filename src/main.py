@@ -1,21 +1,12 @@
 import json
 import logging
-import os
 from pprint import pformat
 from typing import Any
 
-import httpx
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import PlainTextResponse
 
-from wa import parse_notification_payload, verify_token
-
-load_dotenv()
-
-TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
-PHONE_ID = os.getenv("PHONE_ID")
-
+import wa
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,7 +26,7 @@ def verify_webhook(
     challenge: str | None = Query(None, alias="hub.challenge"),
     token: str | None = Query(None, alias="hub.verify_token"),
 ):
-    verified_challenge = verify_token(mode, token, challenge)
+    verified_challenge = wa.verify_token(mode, token, challenge)
     if verified_challenge is not None:
         logger.info("Webhook verified")
         return verified_challenge
@@ -49,7 +40,7 @@ async def webhook(request: Request):
     try:
         payload: dict[str, Any] = await request.json()
         logger.info("Webhook JSON payload:\n%s", json.dumps(payload, indent=4))
-        logger.info(pformat(parse_notification_payload(payload)))
+        logger.info(pformat(wa.parse_notification_payload(payload)))
     except Exception:
         raw = await request.body()
         logger.warning(
@@ -61,31 +52,9 @@ async def webhook(request: Request):
 
 @app.get("/send_message")
 async def send_message():
-    url = f"https://graph.facebook.com/v23.0/{PHONE_ID}/messages"
-    message_payload = {
-        "messaging_product": "whatsapp",
-        "recipient_type": "individual",
-        "to": "+393474846411",
-        "type": "text",
-        "text": {
-            "preview_url": True,
-            "body": "Nel mezzo del cammin di nostra vita\nMi ritrovai per una selva oscura\n\nhttps://github.com/bacchilu",
-        },
-    }
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {TOKEN}",
-    }
-    async with httpx.AsyncClient(timeout=10) as client:
-        response = await client.post(url, json=message_payload, headers=headers)
-
     try:
-        data = response.json()
-    except ValueError:
-        data = {"raw": response.text}
-
-    if response.status_code >= 400:
-        raise HTTPException(status_code=response.status_code, detail=data)
+        data = await wa.send_message()
+    except wa.WAError as e:
+        raise HTTPException(status_code=500, detail=e.payload)
 
     return data
