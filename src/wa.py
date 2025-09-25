@@ -10,10 +10,10 @@ VERIFICATION_TOKEN = os.getenv("VERIFICATION_TOKEN")
 class WhatsAppMessage:
     @classmethod
     def from_payload(cls, message: dict[str, Any]) -> "WhatsAppMessage":
-        if message["type"] == "text":
-            return WhatsAppTextMessage.from_payload(message)
-        else:
-            return WhatsAppUnsupportedMessage(raw=message)
+        W = {"text": WhatsAppTextMessage}.get(
+            message["type"], WhatsAppUnsupportedMessage
+        )
+        return W.from_payload(message)
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,6 +40,10 @@ class WhatsAppTextMessage(WhatsAppMessage):
 @dataclass(frozen=True, slots=True)
 class WhatsAppUnsupportedMessage(WhatsAppMessage):
     raw: dict[str, Any]
+
+    @classmethod
+    def from_payload(cls, message: dict[str, Any]) -> "WhatsAppUnsupportedMessage":
+        return cls(raw=message)
 
 
 def verify_token(mode: str | None, token: str | None, challenge: str | None):
