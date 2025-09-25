@@ -13,7 +13,12 @@ VERIFICATION_TOKEN = os.getenv("VERIFICATION_TOKEN")
 PHONE_ID = os.getenv("PHONE_ID")
 TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
 
-__all__ = ("verify_token", "parse_notification_payload", "WAError", "send_message")
+__all__ = (
+    "verify_token",
+    "parse_notification_payload",
+    "WAError",
+    "send_text_message",
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,7 +84,7 @@ class WAError(Exception):
         return json.dumps(self.payload)
 
 
-async def send_message(to: str, body: str):
+async def send_text_message(to: str, body: str):
     url = f"https://graph.facebook.com/v23.0/{PHONE_ID}/messages"
     message_payload = {
         "messaging_product": "whatsapp",

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 
-class SendMessagePayload(BaseModel):
+class SendTextMessagePayload(BaseModel):
     to: str
     body: str
 
@@ -54,7 +54,7 @@ async def webhook(request: Request):
 @app.get("/send_test_message")
 async def send_test_message():
     try:
-        data = await wa.send_message(
+        data = await wa.send_text_message(
             "+393474846411",
             "Nel mezzo del cammin di nostra vita\nMi ritrovai per una selva oscura\n\nhttps://github.com/bacchilu",
         )
@@ -63,10 +63,10 @@ async def send_test_message():
     return data
 
 
-@app.post("/send_message")
-async def send_message(payload: SendMessagePayload):
+@app.post("/send_text_message")
+async def send_text_message(payload: SendTextMessagePayload):
     try:
-        data = await wa.send_message(payload.to, payload.body)
+        data = await wa.send_text_message(payload.to, payload.body)
     except wa.WAError as e:
         raise HTTPException(status_code=500, detail=e.payload)
     return data

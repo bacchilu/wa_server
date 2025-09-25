@@ -39,7 +39,7 @@ The app exposes these endpoints:
 - `GET /` – handles the Meta webhook verification challenge and returns HTTP 403 when invalid.
 - `POST /` – logs incoming webhook payloads to stdout and responds with `200 OK`.
 - `GET /send_test_message` – sends a sample text message through the WhatsApp Cloud API using the configured credentials.
-- `POST /send_message` – accepts JSON input and relays a custom WhatsApp message via the Cloud API.
+- `POST /send_text_message` – accepts JSON input and relays a custom WhatsApp message via the Cloud API.
 
 ## Docker
 
@@ -94,12 +94,12 @@ curl -X POST http://127.0.0.1:8000/ \
   }'
 ```
 
-### Sample `send_message` request
+### Sample `send_text_message` request
 
 Send a custom WhatsApp message using the POST endpoint (replace the credentials before running):
 
 ```bash
-curl -X POST http://127.0.0.1:8000/send_message \
+curl -X POST http://127.0.0.1:8000/send_text_message \
   -H "Content-Type: application/json" \
   -d '{"to":"+393474846411","body":"Ciao Luca, come stai?"}'
 ```
