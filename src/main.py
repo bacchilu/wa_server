@@ -51,7 +51,7 @@ async def webhook(request: Request):
 @app.get("/send_test_message")
 async def send_test_message():
     try:
-        data = await wa.send_text_message(
+        data = await wa.send_text(
             "+393474846411",
             "Nel mezzo del cammin di nostra vita\nMi ritrovai per una selva oscura\n\nhttps://github.com/bacchilu",
         )
@@ -63,7 +63,7 @@ async def send_test_message():
 @app.post("/send_text_message")
 async def send_text_message(payload: SendTextMessagePayload):
     try:
-        data = await wa.send_text_message(payload.to, payload.body)
+        data = await wa.send_text(payload.to, payload.body)
     except wa.WAError as e:
         raise HTTPException(status_code=500, detail=e.payload)
     return data

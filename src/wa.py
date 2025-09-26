@@ -4,8 +4,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-import httpx
 from dotenv import load_dotenv
+
+from utils import post_json
 
 load_dotenv()
 
@@ -13,12 +14,8 @@ VERIFICATION_TOKEN = os.getenv("VERIFICATION_TOKEN")
 PHONE_ID = os.getenv("PHONE_ID")
 TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
 
-__all__ = (
-    "verify_token",
-    "parse_notification_payload",
-    "WAError",
-    "send_text_message",
-)
+
+__all__ = ("WAError", "verify_token", "parse_notification_payload", "send_text")
 
 
 class WAError(Exception):
@@ -88,7 +85,7 @@ def parse_notification_payload(payload: dict[str, Any]) -> list[WhatsAppMessage]
         raise WAError(payload=payload)
 
 
-async def send_text_message(to: str, body: str):
+async def send_text(to: str, body: str):
     url = f"https://graph.facebook.com/v23.0/{PHONE_ID}/messages"
     message_payload = {
         "messaging_product": "whatsapp",
@@ -97,20 +94,12 @@ async def send_text_message(to: str, body: str):
         "type": "text",
         "text": {"preview_url": True, "body": body},
     }
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {TOKEN}",
-    }
-    async with httpx.AsyncClient(timeout=10) as client:
-        response = await client.post(url, json=message_payload, headers=headers)
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {TOKEN}"}
 
     try:
-        data = response.json()
-    except ValueError:
-        data = {"raw": response.text}
-
-    if response.status_code >= 400:
-        raise WAError(payload=data)
-
-    return data
+        return await post_json(url, message_payload, headers=headers)
+    except Exception as exc:
+        payload = exc.args[0] if exc.args else {"error": "unknown"}
+        if not isinstance(payload, dict):
+            payload = {"error": str(payload)}
+        raise WAError(payload=payload)
