@@ -21,6 +21,15 @@ __all__ = (
 )
 
 
+class WAError(Exception):
+    def __init__(self, payload: dict[str, Any]):
+        super().__init__(payload)
+        self.payload = dict(payload)
+
+    def __str__(self) -> str:
+        return json.dumps(self.payload)
+
+
 @dataclass(frozen=True, slots=True)
 class WhatsAppMessage:
     @classmethod
@@ -64,24 +73,19 @@ class WhatsAppUnsupportedMessage(WhatsAppMessage):
 def verify_token(mode: str | None, token: str | None, challenge: str | None):
     if mode == "subscribe" and token == VERIFICATION_TOKEN and challenge is not None:
         return challenge
+    raise WAError(payload={"mode": mode, "token": token, "challenge": challenge})
 
 
 def parse_notification_payload(payload: dict[str, Any]) -> list[WhatsAppMessage]:
-    messages: list[WhatsAppMessage] = []
-    for entry in payload["entry"]:
-        for change in entry["changes"]:
-            for message in change["value"]["messages"]:
-                messages.append(WhatsAppMessage.from_payload(message))
-    return messages
-
-
-class WAError(Exception):
-    def __init__(self, payload: dict[str, Any]):
-        super().__init__(payload)
-        self.payload = dict(payload)
-
-    def __str__(self) -> str:
-        return json.dumps(self.payload)
+    try:
+        messages: list[WhatsAppMessage] = []
+        for entry in payload["entry"]:
+            for change in entry["changes"]:
+                for message in change["value"]["messages"]:
+                    messages.append(WhatsAppMessage.from_payload(message))
+        return messages
+    except Exception:
+        raise WAError(payload=payload)
 
 
 async def send_text_message(to: str, body: str):
