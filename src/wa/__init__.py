@@ -1,10 +1,9 @@
-import json
 import os
 from typing import Any
 
 from dotenv import load_dotenv
 
-from utils import post_json
+from utils import GenericError, post_json
 
 from .messages import WhatsAppMessage
 
@@ -15,22 +14,16 @@ PHONE_ID = os.getenv("PHONE_ID")
 TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
 
 
-__all__ = ("WAError", "verify_token", "parse_notification_payload", "send_text")
-
-
-class WAError(Exception):
-    def __init__(self, payload: dict[str, Any]):
-        super().__init__(payload)
-        self.payload = dict(payload)
-
-    def __str__(self) -> str:
-        return json.dumps(self.payload)
+__all__ = ("verify_token", "parse_notification_payload", "send_text")
 
 
 def verify_token(mode: str | None, token: str | None, challenge: str | None):
     if mode == "subscribe" and token == VERIFICATION_TOKEN and challenge is not None:
         return challenge
-    raise WAError(payload={"mode": mode, "token": token, "challenge": challenge})
+    raise GenericError(
+        "Invalid webhook verification parameters",
+        {"mode": mode, "token": token, "challenge": challenge},
+    )
 
 
 def parse_notification_payload(payload: dict[str, Any]) -> list[WhatsAppMessage]:
@@ -42,7 +35,7 @@ def parse_notification_payload(payload: dict[str, Any]) -> list[WhatsAppMessage]
                     messages.append(WhatsAppMessage.from_payload(message))
         return messages
     except Exception:
-        raise WAError(payload=payload)
+        raise GenericError("Invalid notification payload", payload)
 
 
 async def send_text(to: str, body: str):
@@ -62,4 +55,4 @@ async def send_text(to: str, body: str):
         payload = exc.args[0] if exc.args else {"error": "unknown"}
         if not isinstance(payload, dict):
             payload = {"error": str(payload)}
-        raise WAError(payload=payload)
+        raise GenericError("Failed to send WhatsApp message", payload)
