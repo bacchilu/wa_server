@@ -1,17 +1,17 @@
 services:
-  wa_server_prod:
+  wa_gateway_prod:
     build:
-      context: ./
+      context: ./wa-gateway
       dockerfile: ./Dockerfile
     ports:
       - "80:8000"
 
-  wa_server_dev:
+  wa_gateway_dev:
     build:
-      context: ./
+      context: ./wa-gateway
       dockerfile: ./Dockerfile
     ports:
       - "8000:8000"
     command: fastapi dev src/main.py --host 0.0.0.0
     volumes:
-      - ./src:/app/src
+      - ./wa-gateway/src:/app/src
