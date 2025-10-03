@@ -15,3 +15,12 @@ services:
     command: fastapi dev src/main.py --host 0.0.0.0
     volumes:
       - ./wa-gateway/src:/app/src
+
+  rabbitmq:
+    image: rabbitmq:4.1.4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
