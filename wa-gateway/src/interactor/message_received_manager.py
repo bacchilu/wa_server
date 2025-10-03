@@ -17,11 +17,11 @@ def _send_to_queue(message: WhatsAppMessage) -> None:
     channel = connection.channel()
     channel.confirm_delivery()
     channel.queue_declare(queue=QUEUE)
-    body = json.dumps({"msg": "Hello World!"})
+    body = json.dumps(message.serialize()).encode()
     channel.basic_publish(
         exchange="",
         routing_key=QUEUE,
-        body=body.encode(),
+        body=body,
         properties=pika.BasicProperties(delivery_mode=2),
         mandatory=True,
     )
