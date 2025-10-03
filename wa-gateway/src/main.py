@@ -3,12 +3,11 @@ import logging
 from pprint import pformat
 from typing import Any
 
+import wa
 from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import PlainTextResponse
+from interactor import MessageReceivedManager, TokenVerifyManager
 from pydantic import BaseModel
-
-import wa
-from interactor import TokenVerifyManager
 from utils import GenericError
 
 logging.basicConfig(level=logging.INFO)
@@ -19,6 +18,7 @@ app = FastAPI()
 
 
 token_verify_manager = TokenVerifyManager()
+message_received_manager = MessageReceivedManager()
 
 
 class SendTextMessagePayload(BaseModel):
@@ -43,11 +43,11 @@ def verify_webhook(
 @app.post("/")
 async def webhook(request: Request):
     logger.debug("Webhook received")
-
     try:
         payload: dict[str, Any] = await request.json()
         logger.info("Webhook JSON payload:\n%s", json.dumps(payload, indent=4))
-        logger.info(pformat(wa.parse_notification_payload(payload)))
+        data = message_received_manager(payload)
+        logger.info(pformat(data))
     except GenericError as exc:
         raise HTTPException(status_code=500, detail=exc.payload)
     return Response(status_code=200)

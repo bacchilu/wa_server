@@ -14,7 +14,7 @@ PHONE_ID = os.getenv("PHONE_ID")
 TOKEN = os.getenv("TOKEN", "TOKEN NOT FOUND")
 
 
-__all__ = ("verify_token", "parse_notification_payload", "send_text")
+__all__ = ("verify_token", "parse_notification_payload", "send_text", "WhatsAppMessage")
 
 
 def verify_token(mode: str | None, token: str | None, challenge: str | None):
