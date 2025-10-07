@@ -25,6 +25,24 @@ docker compose up wa_gateway_prod
 
 `wa_gateway_prod` publishes the service on `http://localhost/`.
 
+Start all services (gateway, consumer, RabbitMQ) with:
+
+```bash
+docker compose up
+```
+
+Shut them down with:
+
+```bash
+docker compose down
+```
+
+Follow just the queue consumer logs with:
+
+```bash
+docker compose logs --follow queue-consumer
+```
+
 ## Next steps
 - Expand source integrations (e.g., email, SMS, other chat platforms).
 - Build a unified UI to browse and action message threads.

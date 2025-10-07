@@ -24,3 +24,12 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
+
+  queue_consumer:
+    build:
+      context: ./queue-consumer
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./queue-consumer:/app
+    depends_on:
+      - rabbitmq
