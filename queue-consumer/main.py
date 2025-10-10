@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from pprint import pformat
 
@@ -7,6 +8,10 @@ import pika
 from pika import BasicProperties
 from pika.adapters.blocking_connection import BlockingChannel
 from pika.spec import Basic
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 QUEUE = "wa_messages"
 RABBITMQ_HOST = "rabbitmq"
@@ -17,19 +22,15 @@ def callback(
     ch: BlockingChannel, method: Basic.Deliver, properties: BasicProperties, body: bytes
 ) -> None:
     payload = json.loads(body.decode())
-    print(" [x] Received", flush=True)
-    print(pformat(payload), flush=True)
-    print("", flush=True)
+    logger.info(" [x] Received")
+    logger.debug(pformat(payload))
 
     try:
         response = httpx.post(BACKEND_WEBHOOK_URL, json=payload)
         response.raise_for_status()
-        print(
-            f" [>] Forwarded to {BACKEND_WEBHOOK_URL} ({response.status_code})",
-            flush=True,
-        )
+        logger.info(f" [>] Forwarded to {BACKEND_WEBHOOK_URL} ({response.status_code})")
     except httpx.HTTPError as exc:
-        print(f" [!] Failed to forward to backend: {exc}", flush=True)
+        logger.exception(f" [!] Failed to forward to backend: {exc}")
 
 
 if __name__ == "__main__":
@@ -42,6 +43,6 @@ if __name__ == "__main__":
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE)
     channel.basic_consume(queue=QUEUE, auto_ack=True, on_message_callback=callback)
-    print(" [*] Waiting for messages. To exit press CTRL+C", flush=True)
+    logger.info(" [*] Waiting for messages. To exit press CTRL+C")
     channel.start_consuming()
     connection.close()
