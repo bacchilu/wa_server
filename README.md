@@ -1,49 +1,54 @@
 # MSG Manager
 
-MSG Manager is a web application that presents conversations from multiple messaging sources in a unified thread-first experience. The initial integration focuses on WhatsApp via the WA Gateway service housed in `wa-gateway/`.
-
-## Project structure
-- `wa-gateway/` – FastAPI-based WhatsApp integration; handles webhooks, verification, and message dispatch.
+MSG Manager brings WhatsApp events into a thread-first experience. The
+repository bundles multiple services wired together with Docker Compose so you
+can develop the messages panel UI, validate webhook handling, and inspect queue
+traffic locally.
 
 ## Prerequisites
-- Docker with the Compose plugin available.
-- WhatsApp Cloud API credentials configured in `wa-gateway/.env` (see `wa-gateway/README.md`).
+- Docker 24+ with the Compose plugin
+- WhatsApp Cloud API credentials stored in `wa-gateway/.env` (`TOKEN`,
+  `PHONE_ID`, `VERIFICATION_TOKEN`)
 
-## Running with Docker Compose
+## Docker Compose Services
 
-```bash
-docker compose up wa_gateway_dev
-```
+### wa_gateway_dev — port 8000
+- **Role:** FastAPI webhook receiver with autoreload for the WhatsApp
+  integration.
+- **Run:** `docker compose up wa_gateway_dev`
 
-`wa_gateway_dev` hot-reloads the FastAPI app and exposes it at `http://localhost:8000/`.
+### wa_gateway_prod — port 80
+- **Role:** Production-style build of the gateway served by Uvicorn inside the
+  container.
+- **Run:** `docker compose up wa_gateway_prod`
 
-For a production-style build that serves the prebuilt image:
+### backend — port 8001
+- **Role:** Python FastAPI stack that will render the messages panel frontend;
+  mirrors the gateway infrastructure for experimentation.
+- **Run:** `docker compose up backend`
 
-```bash
-docker compose up wa_gateway_prod
-```
+### frontend — port 5173
+- **Role:** React + Vite development server that serves the same messages panel
+  UI from a Node toolchain.
+- **Run:** `docker compose up frontend`
 
-`wa_gateway_prod` publishes the service on `http://localhost/`.
+### queue_consumer
+- **Role:** Python worker that reads the `wa_messages` RabbitMQ queue and
+  pretty-prints payloads for debugging.
+- **Run:** `docker compose up queue_consumer`
 
-Start all services (gateway, consumer, RabbitMQ) with:
+### rabbitmq — ports 5672 / 15672
+- **Role:** Message broker used by the gateway and consumer; exposes the
+  management UI on port 15672.
+- **Run:** `docker compose up rabbitmq`
 
-```bash
-docker compose up
-```
+## Common Workflows
+- Start the full stack (gateway dev + UI + broker + consumer):
+  `docker compose up`
+- Stop running containers: `docker compose down`
+- Follow queue consumer logs: `docker compose logs --follow queue_consumer`
 
-Shut them down with:
-
-```bash
-docker compose down
-```
-
-Follow just the queue consumer logs with:
-
-```bash
-docker compose logs --follow queue-consumer
-```
-
-## Next steps
-- Expand source integrations (e.g., email, SMS, other chat platforms).
-- Build a unified UI to browse and action message threads.
-- Add orchestration services for message routing across channels.
+## Next Steps
+- Add more inbound connectors (email, SMS, other chat platforms)
+- Expand the shared messages panel UI across backend and frontend stacks
+- Introduce orchestration layers for routing and analytics
