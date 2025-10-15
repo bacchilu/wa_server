@@ -6,13 +6,14 @@ from typing import Any, Literal
 from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict
 
+from .data_gateway import MockDB
 from .entities import WebhookMessage as WebhookMessageEntity
 from .services import MessagesService
 
 logger = logging.getLogger(__name__)
 
 
-messages_service = MessagesService()
+messages_service = MessagesService(MockDB)
 
 
 class TextMessage(BaseModel):
