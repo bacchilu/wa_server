@@ -13,3 +13,6 @@ class MessagesService:
 
     def push(self, dto_message: WebhookMessage):
         self.db.push_message(dto_message)
+
+    def get_messages(self) -> list[WebhookMessage]:
+        return self.db.get_messages()

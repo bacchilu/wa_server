@@ -11,3 +11,7 @@ class MockDB(MessageStore):
     @classmethod
     def push_message(cls, message: WebhookMessage) -> None:
         cls._db.append(message)
+
+    @classmethod
+    def get_messages(cls) -> list[WebhookMessage]:
+        return cls._db

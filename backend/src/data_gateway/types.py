@@ -10,3 +10,6 @@ from ..entities import WebhookMessage
 class MessageStore(Protocol):
     @classmethod
     def push_message(cls, message: WebhookMessage) -> None: ...
+
+    @classmethod
+    def get_messages(cls) -> list[WebhookMessage]: ...

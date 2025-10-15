@@ -36,6 +36,9 @@ class TextMessage(WebhookMessage):
         del payload["type"]
         return cls(**payload)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {**asdict(self), "type": "text"}
+
 
 @dataclass(frozen=True)
 class UnsupportedMessage(WebhookMessage):
@@ -44,3 +47,6 @@ class UnsupportedMessage(WebhookMessage):
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> "UnsupportedMessage":
         return cls(raw=payload)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {**asdict(self), "type": "unknown"}
