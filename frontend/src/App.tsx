@@ -1,22 +1,15 @@
-import axios from 'axios';
 import {useState} from 'react';
 
 import './App.css';
 
-type RequestState = 'idle' | 'loading' | 'success' | 'error';
+import {getMessages} from './api/messages_mock';
+import type {Message} from './entities/messages';
 
-const getMessages = async function (): Promise<any> {
-    try {
-        const response = await axios.get('http://localhost:8001/messages');
-        return response.data;
-    } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Unknown error');
-    }
-};
+type RequestState = 'idle' | 'loading' | 'success' | 'error';
 
 export const App = function () {
     const [status, setStatus] = useState<RequestState>('idle');
-    const [payload, setPayload] = useState<unknown>(null);
+    const [payload, setPayload] = useState<Message[] | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const handleFetchMessages = async function () {
@@ -40,7 +33,7 @@ export const App = function () {
             </header>
 
             <div className="row justify-content-center">
-                <div className="col-lg-6">
+                <div className="col-lg-12">
                     <div className="card shadow-sm border-0">
                         <div className="card-body">
                             <button
@@ -57,7 +50,7 @@ export const App = function () {
                                 )}
                                 {status === 'success' && (
                                     <pre className="bg-body-tertiary p-3 rounded">
-                                        {JSON.stringify(payload, null, 1)}
+                                        {JSON.stringify(payload ?? [], null, 1)}
                                     </pre>
                                 )}
                                 {status === 'error' && <p className="text-danger mb-0">Error: {error}</p>}
