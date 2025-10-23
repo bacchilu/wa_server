@@ -25,32 +25,40 @@ const JSONContent: React.FC<{value: Message[]}> = function ({value}) {
     return <pre className="bg-body-tertiary p-3 rounded mt-3">{JSON.stringify(value, null, 1)}</pre>;
 };
 
+const MessagesPanel: React.FC<{messages: Message[]}> = function ({messages}) {
+    return (
+        <div className="shadow-lg">
+            <JSONContent value={messages} />
+        </div>
+    );
+};
+
 const BodyContent = function () {
     const {data: messages, error} = useMessages();
 
     if (error !== undefined) return <ErrorMessage msg={error.message} />;
     if (messages === undefined) return <Spinner msg="Loading messages…" />;
     if (messages.length === 0) return <Message msg="No messages yet. Incoming webhooks will appear here." />;
-    return <JSONContent value={messages} />;
+    return <MessagesPanel messages={messages} />;
 };
 
+const Navbar = function () {
+    return (
+        <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
+            <div className="container">
+                <span className="navbar-brand fw-semibold">MSG Manager</span>
+                <span className="text-secondary">Messages Workspace</span>
+            </div>
+        </nav>
+    );
+};
 export const App = function () {
     return (
-        <div className="container py-5">
-            <header className="text-center mb-5">
-                <h1 className="display-5 fw-semibold">MSG Manager Frontend</h1>
-                <p className="text-muted mb-0">Bootstrap-powered React starter</p>
-            </header>
-
-            <div className="row justify-content-center">
-                <div className="col-lg-12">
-                    <div className="card shadow-sm border-0">
-                        <div className="card-body">
-                            <BodyContent />
-                        </div>
-                    </div>
-                </div>
+        <>
+            <Navbar />
+            <div className="container py-4">
+                <BodyContent />
             </div>
-        </div>
+        </>
     );
 };

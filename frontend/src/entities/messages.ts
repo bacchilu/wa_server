@@ -2,7 +2,7 @@ export interface TextMessage {
     type: 'text';
     customer_id: string;
     id: string;
-    timestamp: string;
+    timestamp: Date;
     body: string;
 }
 
