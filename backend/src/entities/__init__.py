@@ -1,4 +1,4 @@
-__all__ = ["WebhookMessage"]
+__all__ = ["WebhookMessage", "TextMessage"]
 
 
-from .message import WebhookMessage
+from .message import TextMessage, WebhookMessage
