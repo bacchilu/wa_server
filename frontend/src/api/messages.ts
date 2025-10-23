@@ -1,35 +1,36 @@
 import axios from 'axios';
+import {z, ZodError} from 'zod';
 
 import type {Message} from '../entities/messages';
 
-interface RawTextMessage {
-    type: 'text';
-    customer_id: string;
-    id: string;
-    timestamp: string;
-    body: string;
-}
+const TextMessageSchema = z.object({
+    type: z.literal('text'),
+    customer_id: z.string(),
+    id: z.string(),
+    timestamp: z.coerce.date(),
+    body: z.string(),
+});
 
-interface RawUnknownMessage {
-    type: 'unknown';
-    raw: Record<string, unknown>;
-}
+const UnknownMessageSchema = z.object({type: z.literal('unknown'), raw: z.record(z.string(), z.unknown())});
 
-type RawMessage = RawTextMessage | RawUnknownMessage;
+const MessageSchema: z.ZodType<Message> = z.union([
+    TextMessageSchema,
+    UnknownMessageSchema,
+]) satisfies z.ZodType<Message>;
 
-const normalizeMessage = function (message: RawMessage): Message {
-    if (message.type === 'text') {
-        const {timestamp, ...rest} = message;
-        return {...rest, timestamp: new Date(timestamp)};
-    }
-    return message;
+type ParsedMessage = z.infer<typeof MessageSchema>;
+
+const parseMessages = function (payload: unknown): ParsedMessage[] {
+    return MessageSchema.array().parse(payload);
 };
 
-export const getMessages = async (): Promise<Message[]> => {
+export const getMessages = async function (): Promise<Message[]> {
     try {
-        const response = await axios.get<RawMessage[]>('http://localhost:8001/messages');
-        return response.data.map(normalizeMessage);
+        const response = await axios.get('http://localhost:8001/messages');
+        return parseMessages(response.data);
     } catch (err) {
-        throw new Error(err instanceof Error ? err.message : 'Unknown error');
+        if (err instanceof ZodError) throw new Error(`Invalid message payload: ${err.message}`);
+        if (err instanceof Error) throw new Error(err.message);
+        throw new Error('Unknown error');
     }
 };
