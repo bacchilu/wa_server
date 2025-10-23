@@ -1,3 +1,5 @@
+import groupBy from 'lodash/groupBy.js';
+
 import './App.css';
 import type {Message} from './entities/messages';
 import {useMessages} from './hooks/useMessages';
@@ -26,11 +28,13 @@ const JSONContent: React.FC<{value: Message[]}> = function ({value}) {
 };
 
 const MessagesPanel: React.FC<{messages: Message[]}> = function ({messages}) {
-    return (
-        <div className="shadow-lg">
-            <JSONContent value={messages} />
+    const byCustomer = groupBy(messages, 'customer_id');
+
+    return Object.keys(byCustomer).map((customer_id) => (
+        <div key={customer_id} className="shadow-lg">
+            <JSONContent value={byCustomer[customer_id]} />
         </div>
-    );
+    ));
 };
 
 const BodyContent = function () {
