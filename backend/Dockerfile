@@ -19,6 +19,6 @@ COPY ./src ./src
 ENV PATH="/home/$USERNAME/.local/bin:$PATH"
 RUN pip3 install -r requirements.txt
 
-CMD ["fastapi", "run", "src/main.py"]
+CMD ["fastapi", "run", "src/routes/main.py"]
 
 EXPOSE 8000

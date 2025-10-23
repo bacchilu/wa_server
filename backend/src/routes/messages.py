@@ -2,8 +2,8 @@ import logging
 
 from fastapi import APIRouter
 
-from .data_gateway import MockDB
-from .services import MessagesService
+from ..data_gateway import MockDB
+from ..services import MessagesService
 
 logger = logging.getLogger(__name__)
 

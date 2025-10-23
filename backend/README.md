@@ -11,7 +11,7 @@ Install dependencies and start the development server with FastAPI's built-in au
 
 ```bash
 pip install -r backend/requirements.txt
-fastapi dev backend/src/main.py
+fastapi dev backend/src/routes/main.py
 ```
 
 The API will be available at `http://localhost:8000/` with the interactive docs at `/docs`.
@@ -20,6 +20,6 @@ The API will be available at `http://localhost:8000/` with the interactive docs 
 The project-level `docker compose up backend` target builds the container defined in `backend/Dockerfile`, exposes it on port `8001`, and bind-mounts `backend/src/` so code changes reload automatically.
 
 ## Layout
-- `backend/src/main.py` – FastAPI application entry point.
+- `backend/src/routes/main.py` – FastAPI application entry point.
 - `backend/requirements.txt` – Python dependencies.
 - `backend/Dockerfile` – Container image used by the compose service.
