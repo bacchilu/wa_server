@@ -1,6 +1,9 @@
 import groupBy from 'lodash/groupBy.js';
+import React from 'react';
 
 import './App.css';
+import type {SidebarItem} from './components/Sidebar';
+import {Sidebar} from './components/Sidebar';
 import type {Message} from './entities/messages';
 import {useMessages} from './hooks/useMessages';
 
@@ -46,23 +49,47 @@ const BodyContent = function () {
     return <MessagesPanel messages={messages} />;
 };
 
-const Navbar = function () {
+const menuItems: SidebarItem[] = [
+    {id: 'messages', label: 'Messages Feed', href: '#messages'},
+    {id: 'templates', label: 'Templates', href: '#templates'},
+    {id: 'settings', label: 'Settings', href: '#settings'},
+];
+
+const Navbar: React.FC<{onToggleSidebar: () => void}> = function ({onToggleSidebar}) {
     return (
         <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
-            <div className="container">
-                <span className="navbar-brand fw-semibold">MSG Manager</span>
-                <span className="text-secondary">Messages Workspace</span>
+            <div className="container-fluid justify-content-between">
+                <div>
+                    <span className="navbar-brand fw-semibold">MSG Manager</span>
+                    <span className="text-secondary ms-lg-3">Messages Workspace</span>
+                </div>
+                <button type="button" className="btn btn-outline-light d-lg-none" onClick={onToggleSidebar}>
+                    Menu
+                </button>
             </div>
         </nav>
     );
 };
+
 export const App = function () {
+    const [isSidebarOpen, setSidebarOpen] = React.useState(true);
+
     return (
-        <>
-            <Navbar />
-            <div className="container py-4">
-                <BodyContent />
+        <div className="app-root">
+            <Navbar onToggleSidebar={() => setSidebarOpen(true)} />
+            <div className="app-shell">
+                <Sidebar
+                    title="Threads"
+                    items={menuItems}
+                    isOpen={isSidebarOpen}
+                    onClose={() => setSidebarOpen(false)}
+                />
+                <main className="app-content">
+                    <div className="app-content__inner container">
+                        <BodyContent />
+                    </div>
+                </main>
             </div>
-        </>
+        </div>
     );
 };
