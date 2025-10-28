@@ -130,6 +130,23 @@ body {
     max-width: 100%;
 }
 
+.app-menu-toggle {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .app-menu-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: calc(var(--navbar-height) + 0.75rem);
+        left: 1rem;
+        z-index: 1100;
+        box-shadow: 0 0.5rem 1rem rgba(33, 37, 41, 0.12);
+    }
+}
+
 .logo-link {
     display: inline-flex;
     align-items: center;

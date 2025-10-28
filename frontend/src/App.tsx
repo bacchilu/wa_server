@@ -55,7 +55,7 @@ const menuItems: SidebarItem[] = [
     {id: 'settings', label: 'Settings', href: '#settings'},
 ];
 
-const Navbar: React.FC<{onToggleSidebar: () => void}> = function ({onToggleSidebar}) {
+const Navbar: React.FC = function () {
     return (
         <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
             <div className="container-fluid justify-content-between">
@@ -63,9 +63,6 @@ const Navbar: React.FC<{onToggleSidebar: () => void}> = function ({onToggleSideb
                     <span className="navbar-brand fw-semibold">MSG Manager</span>
                     <span className="text-secondary ms-lg-3">Messages Workspace</span>
                 </div>
-                <button type="button" className="btn btn-outline-light d-lg-none" onClick={onToggleSidebar}>
-                    Menu
-                </button>
             </div>
         </nav>
     );
@@ -74,16 +71,23 @@ const Navbar: React.FC<{onToggleSidebar: () => void}> = function ({onToggleSideb
 export const App = function () {
     const [isSidebarOpen, setSidebarOpen] = React.useState(true);
 
+    const openSidebar = function () {
+        setSidebarOpen(true);
+    };
+    const closeSidebar = function () {
+        setSidebarOpen(false);
+    };
+
     return (
         <div className="app-root">
-            <Navbar onToggleSidebar={() => setSidebarOpen(true)} />
+            <Navbar />
             <div className="app-shell">
-                <Sidebar
-                    title="Threads"
-                    items={menuItems}
-                    isOpen={isSidebarOpen}
-                    onClose={() => setSidebarOpen(false)}
-                />
+                {!isSidebarOpen && (
+                    <a className="btn btn-outline-dark btn-sm app-menu-toggle" href="#messages" onClick={openSidebar}>
+                        Messages
+                    </a>
+                )}
+                <Sidebar title="Threads" items={menuItems} isOpen={isSidebarOpen} onClose={closeSidebar} />
                 <main className="app-content">
                     <div className="app-content__inner container">
                         <BodyContent />
