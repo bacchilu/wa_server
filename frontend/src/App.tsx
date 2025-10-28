@@ -2,9 +2,9 @@ import groupBy from 'lodash/groupBy.js';
 import React from 'react';
 
 import './App.css';
+import {MainPanel} from './components/MainPanel';
 import type {SidebarItem} from './components/Sidebar';
 import {Sidebar} from './components/Sidebar';
-import type {Message} from './entities/messages';
 import {useMessages} from './hooks/useMessages';
 
 const Spinner: React.FC<{msg: string}> = function ({msg}) {
@@ -22,39 +22,6 @@ const ErrorMessage: React.FC<{msg: string}> = function ({msg}) {
     return <p className="text-danger mb-0 mt-3">Error: {msg}</p>;
 };
 
-const Message: React.FC<{msg: string}> = function ({msg}) {
-    return <p className="text-muted mb-0 mt-3">{msg}</p>;
-};
-
-const JSONContent: React.FC<{value: Message[]}> = function ({value}) {
-    return <pre className="bg-body-tertiary p-3 rounded mt-3">{JSON.stringify(value, null, 1)}</pre>;
-};
-
-const MessagesPanel: React.FC<{messages: Message[]}> = function ({messages}) {
-    const byCustomer = groupBy(messages, 'customer_id');
-
-    return Object.keys(byCustomer).map((customer_id) => (
-        <div key={customer_id} className="shadow-lg">
-            <JSONContent value={byCustomer[customer_id]} />
-        </div>
-    ));
-};
-
-const BodyContent = function () {
-    const {data: messages, error} = useMessages();
-
-    if (error !== undefined) return <ErrorMessage msg={error.message} />;
-    if (messages === undefined) return <Spinner msg="Loading messages…" />;
-    if (messages.length === 0) return <Message msg="No messages yet. Incoming webhooks will appear here." />;
-    return <MessagesPanel messages={messages} />;
-};
-
-const menuItems: SidebarItem[] = [
-    {id: 'messages', label: 'Messages Feed', href: '#messages'},
-    {id: 'templates', label: 'Templates', href: '#templates'},
-    {id: 'settings', label: 'Settings', href: '#settings'},
-];
-
 const Navbar: React.FC = function () {
     return (
         <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
@@ -68,32 +35,67 @@ const Navbar: React.FC = function () {
     );
 };
 
-export const App = function () {
+const MessagesSidebar: React.FC<{isSidebarOpen: boolean; setSidebarOpen: (v: boolean) => void}> = function ({
+    isSidebarOpen,
+    setSidebarOpen,
+}) {
+    const {data: messages} = useMessages();
+
+    const closeSidebar = function () {
+        setSidebarOpen(false);
+    };
+
+    const byCustomer = groupBy(messages, 'customer_id');
+    const menuItems: SidebarItem[] = Object.keys(byCustomer).map((customer_id) => ({
+        id: customer_id,
+        label: customer_id,
+        href: `#${customer_id}`,
+    }));
+    return <Sidebar title="Threads" items={menuItems} isOpen={isSidebarOpen} onClose={closeSidebar} />;
+};
+
+const CenteredState: React.FC<{children: React.ReactNode}> = function ({children}) {
+    return <div className="app-empty-state">{children}</div>;
+};
+
+const AppShell = function () {
+    const {data: messages, error} = useMessages();
     const [isSidebarOpen, setSidebarOpen] = React.useState(true);
 
     const openSidebar = function () {
         setSidebarOpen(true);
     };
-    const closeSidebar = function () {
-        setSidebarOpen(false);
-    };
 
+    if (error !== undefined)
+        return (
+            <CenteredState>
+                <ErrorMessage msg={error.message} />
+            </CenteredState>
+        );
+    if (messages === undefined)
+        return (
+            <CenteredState>
+                <Spinner msg="Loading messages…" />
+            </CenteredState>
+        );
+    return (
+        <div className="app-shell">
+            {!isSidebarOpen && (
+                <a className="btn btn-outline-dark btn-sm app-menu-toggle" href="#messages" onClick={openSidebar}>
+                    Messages
+                </a>
+            )}
+            <MessagesSidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <MainPanel />
+        </div>
+    );
+};
+
+export const App = function () {
     return (
         <div className="app-root">
             <Navbar />
-            <div className="app-shell">
-                {!isSidebarOpen && (
-                    <a className="btn btn-outline-dark btn-sm app-menu-toggle" href="#messages" onClick={openSidebar}>
-                        Messages
-                    </a>
-                )}
-                <Sidebar title="Threads" items={menuItems} isOpen={isSidebarOpen} onClose={closeSidebar} />
-                <main className="app-content">
-                    <div className="app-content__inner container">
-                        <BodyContent />
-                    </div>
-                </main>
-            </div>
+            <AppShell />
         </div>
     );
 };

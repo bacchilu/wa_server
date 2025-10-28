@@ -33,6 +33,14 @@ body {
     background-color: #f8f9fa;
 }
 
+.app-empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
 .app-sidebar {
     width: 260px;
     flex-shrink: 0;
