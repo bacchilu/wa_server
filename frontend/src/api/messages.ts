@@ -26,7 +26,7 @@ const parseMessages = function (payload: unknown): ParsedMessage[] {
 
 export const getMessages = async function (): Promise<Message[]> {
     try {
-        const response = await axios.get('http://localhost:8001/messages');
+        const response = await axios.get('/api/messages');
         return parseMessages(response.data);
     } catch (err) {
         if (err instanceof ZodError) throw new Error(`Invalid message payload: ${err.message}`);
