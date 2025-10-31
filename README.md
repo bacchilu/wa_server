@@ -10,6 +10,26 @@ traffic locally.
 - WhatsApp Cloud API credentials stored in `wa-gateway/.env` (`TOKEN`,
   `PHONE_ID`, `VERIFICATION_TOKEN`)
 
+## Start & Stop the Stack
+Set your local user and group IDs before launching Docker so bind mounts inherit the correct permissions:
+
+```bash
+export USER_ID="$(id -u)"
+export GROUP_ID="$(id -g)"
+```
+
+Then start all services with Docker Compose:
+
+```bash
+docker compose up
+```
+
+To stop and remove the containers, run:
+
+```bash
+docker compose down
+```
+
 ## Docker Compose Services
 
 ### wa_gateway_dev — port 8000
