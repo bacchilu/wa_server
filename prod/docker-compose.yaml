@@ -1,61 +1,53 @@
 services:
   rabbitmq:
     image: rabbitmq:4.2.0-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
+    expose: ["5672"]
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
   wa_gateway_dev:
     build:
-      context: ./wa-gateway
+      context: ../wa-gateway
       dockerfile: ./Dockerfile
       args:
         USER_ID: ${USER_ID}
         GROUP_ID: ${GROUP_ID}
     ports:
       - "8000:8000"
-    command: fastapi dev src/main.py --host 0.0.0.0
-    volumes:
-      - ./wa-gateway/src:/app/src
+    command: fastapi run src/main.py --host 0.0.0.0
     depends_on:
       - rabbitmq
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: ./Dockerfile
       args:
         USER_ID: ${USER_ID}
         GROUP_ID: ${GROUP_ID}
-    ports:
-      - "8001:8000"
-    command: fastapi dev src/routes/main.py --host 0.0.0.0
-    volumes:
-      - ./backend/src:/app/src
+    expose: ["8000"]
+    command: fastapi run src/routes/main.py --host 0.0.0.0
   queue_consumer:
     build:
-      context: ./queue-consumer
+      context: ../queue-consumer
       dockerfile: ./Dockerfile
       args:
         USER_ID: ${USER_ID}
         GROUP_ID: ${GROUP_ID}
-    volumes:
-      - ./queue-consumer:/app
     depends_on:
       - rabbitmq
       - backend
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: ./Dockerfile
       args:
         USER_ID: ${USER_ID}
         GROUP_ID: ${GROUP_ID}
     ports:
       - "5173:5173"
+    command: npm run serve
     volumes:
-      - ./frontend/src:/app/src
+      - ../frontend/src:/app/src
     stdin_open: true
     tty: true
     depends_on:

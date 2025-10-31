@@ -18,9 +18,10 @@ export USER_ID="$(id -u)"
 export GROUP_ID="$(id -g)"
 ```
 
-Then start all services with Docker Compose:
+Then start all services with the development Compose file (run commands from the `dev/` directory):
 
 ```bash
+cd dev
 docker compose up
 ```
 
@@ -30,11 +31,12 @@ To stop and remove the containers, run:
 docker compose down
 ```
 
+All Docker Compose commands below assume you remain in the `dev/` directory.
+
 ## Docker Compose Services
 
 ### wa_gateway_dev — port 8000
-- **Role:** FastAPI webhook receiver with autoreload for the WhatsApp
-  integration.
+- **Role:** FastAPI webhook receiver with autoreload for the WhatsApp integration.
 - **Run:** `docker compose up wa_gateway_dev`
 
 ### wa_gateway_prod — port 80
@@ -43,8 +45,7 @@ docker compose down
 - **Run:** `docker compose up wa_gateway_prod`
 
 ### backend — port 8001
-- **Role:** Python FastAPI stack that will render the messages panel frontend;
-  mirrors the gateway infrastructure for experimentation.
+- **Role:** Python FastAPI stack that will render the messages panel frontend; mirrors the gateway infrastructure for experimentation.
 - **Run:** `docker compose up backend`
 
 ### frontend — port 5173
@@ -63,8 +64,7 @@ docker compose down
 - **Run:** `docker compose up rabbitmq`
 
 ## Common Workflows
-- Start the full stack (gateway dev + UI + broker + consumer):
-  `docker compose up`
+- Start the full stack (gateway dev + UI + broker + consumer): `docker compose up`
 - Stop running containers: `docker compose down`
 - Follow queue consumer logs: `docker compose logs --follow queue_consumer`
 
