@@ -41,7 +41,11 @@ const AppShell: React.FC<{activeCustomerId?: string}> = function ({activeCustome
                     Messages
                 </button>
             )}
-            <MessagesSidebar isSidebarOpen={isSidebarOpen} setSidebarOpen={setSidebarOpen} />
+            <MessagesSidebar
+                isSidebarOpen={isSidebarOpen}
+                setSidebarOpen={setSidebarOpen}
+                customerId={activeCustomerId}
+            />
             {activeCustomerId === undefined ? <MainPanel /> : <ThreadPanel customerId={activeCustomerId} />}
         </div>
     );

@@ -13,7 +13,8 @@ const Sidebar: React.FC<{
     items: SidebarItem[];
     isOpen: boolean;
     onClose: () => void;
-}> = function ({title, items, isOpen, onClose}) {
+    customerId?: string;
+}> = function ({title, items, isOpen, onClose, customerId}) {
     const handleItemClick = function (item: SidebarItem) {
         return () => {
             console.log(item);
@@ -48,10 +49,11 @@ const Sidebar: React.FC<{
     );
 };
 
-export const MessagesSidebar: React.FC<{isSidebarOpen: boolean; setSidebarOpen: (v: boolean) => void}> = function ({
-    isSidebarOpen,
-    setSidebarOpen,
-}) {
+export const MessagesSidebar: React.FC<{
+    isSidebarOpen: boolean;
+    setSidebarOpen: (v: boolean) => void;
+    customerId?: string;
+}> = function ({isSidebarOpen, setSidebarOpen, customerId}) {
     const {data: messages} = useMessages();
 
     const closeSidebar = function () {
@@ -64,5 +66,13 @@ export const MessagesSidebar: React.FC<{isSidebarOpen: boolean; setSidebarOpen: 
         label: customer_id,
         href: `#/thread/${customer_id}`,
     }));
-    return <Sidebar title="Threads" items={menuItems} isOpen={isSidebarOpen} onClose={closeSidebar} />;
+    return (
+        <Sidebar
+            title="Threads"
+            items={menuItems}
+            isOpen={isSidebarOpen}
+            onClose={closeSidebar}
+            customerId={customerId}
+        />
+    );
 };
