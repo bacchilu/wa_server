@@ -18,7 +18,9 @@ const MessagesPanel = function () {
     ));
 };
 
-export const MainPanel = function () {
+export const ThreadPanel: React.FC<{customerId: string}> = function ({customerId}) {
+    console.log(customerId);
+
     return (
         <main className="app-content">
             <div className="app-content__inner container">
