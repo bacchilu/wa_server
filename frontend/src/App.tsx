@@ -1,49 +1,14 @@
-import groupBy from 'lodash/groupBy.js';
 import React from 'react';
 import {Link, Navigate, Route, Routes, useParams} from 'react-router';
 
 import './App.css';
 import {MainPanel} from './components/main-panel';
 import {ErrorMessage} from './components/messages';
-import type {SidebarItem} from './components/Sidebar';
-import {Sidebar} from './components/Sidebar';
+import {Navbar} from './components/navbar';
+import {MessagesSidebar} from './components/sidebar';
 import {Spinner} from './components/spinner';
 import {ThreadPanel} from './components/thread-panel';
 import {useMessages} from './hooks/useMessages';
-
-const Navbar: React.FC = function () {
-    return (
-        <nav className="navbar navbar-expand-lg bg-dark navbar-dark">
-            <div className="container-fluid justify-content-between">
-                <div>
-                    <Link to="/" className="navbar-brand fw-semibold">
-                        MSG Manager
-                    </Link>
-                    <span className="text-secondary ms-lg-3">Messages Workspace</span>
-                </div>
-            </div>
-        </nav>
-    );
-};
-
-const MessagesSidebar: React.FC<{isSidebarOpen: boolean; setSidebarOpen: (v: boolean) => void}> = function ({
-    isSidebarOpen,
-    setSidebarOpen,
-}) {
-    const {data: messages} = useMessages();
-
-    const closeSidebar = function () {
-        setSidebarOpen(false);
-    };
-
-    const byCustomer = groupBy(messages, 'customer_id');
-    const menuItems: SidebarItem[] = Object.keys(byCustomer).map((customer_id) => ({
-        id: customer_id,
-        label: customer_id,
-        href: `#/thread/${customer_id}`,
-    }));
-    return <Sidebar title="Threads" items={menuItems} isOpen={isSidebarOpen} onClose={closeSidebar} />;
-};
 
 const CenteredState: React.FC<{children: React.ReactNode}> = function ({children}) {
     return <div className="app-empty-state">{children}</div>;

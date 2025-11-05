@@ -1,4 +1,6 @@
+import groupBy from 'lodash/groupBy.js';
 import React from 'react';
+import {useMessages} from '../hooks/useMessages';
 
 export type SidebarItem = {
     id: string;
@@ -6,7 +8,7 @@ export type SidebarItem = {
     href: string;
 };
 
-export const Sidebar: React.FC<{
+const Sidebar: React.FC<{
     title: string;
     items: SidebarItem[];
     isOpen: boolean;
@@ -44,4 +46,23 @@ export const Sidebar: React.FC<{
             <div className={`app-sidebar__backdrop d-lg-none ${isOpen ? 'is-visible' : ''}`} onClick={onClose} />
         </>
     );
+};
+
+export const MessagesSidebar: React.FC<{isSidebarOpen: boolean; setSidebarOpen: (v: boolean) => void}> = function ({
+    isSidebarOpen,
+    setSidebarOpen,
+}) {
+    const {data: messages} = useMessages();
+
+    const closeSidebar = function () {
+        setSidebarOpen(false);
+    };
+
+    const byCustomer = groupBy(messages, 'customer_id');
+    const menuItems: SidebarItem[] = Object.keys(byCustomer).map((customer_id) => ({
+        id: customer_id,
+        label: customer_id,
+        href: `#/thread/${customer_id}`,
+    }));
+    return <Sidebar title="Threads" items={menuItems} isOpen={isSidebarOpen} onClose={closeSidebar} />;
 };
