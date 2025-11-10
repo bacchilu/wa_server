@@ -15,6 +15,7 @@ const Sidebar: React.FC<{
     onClose: () => void;
     customerId?: string;
 }> = function ({title, items, isOpen, onClose, customerId}) {
+    console.log(customerId);
     const handleItemClick = function (item: SidebarItem) {
         return () => {
             console.log(item);
