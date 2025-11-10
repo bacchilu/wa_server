@@ -2,12 +2,14 @@ __all__ = ["WebhookMessage", "TextMessage"]
 
 
 from dataclasses import asdict, dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
 @dataclass(frozen=True)
 class WebhookMessage:
+    timestamp: datetime
+
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> "WebhookMessage":
         if "type" not in payload:
@@ -28,7 +30,6 @@ class WebhookMessage:
 class TextMessage(WebhookMessage):
     customer_id: str
     id: str
-    timestamp: datetime
     body: str
 
     @classmethod
@@ -46,7 +47,7 @@ class UnsupportedMessage(WebhookMessage):
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> "UnsupportedMessage":
-        return cls(raw=payload)
+        return cls(raw=payload, timestamp=datetime.now(timezone.utc))
 
     def to_dict(self) -> dict[str, Any]:
         return {**asdict(self), "type": "unknown"}
