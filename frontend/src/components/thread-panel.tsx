@@ -3,14 +3,16 @@ import groupBy from 'lodash/groupBy.js';
 import {MessageType, type Message, type TextMessage} from '../entities/messages';
 import {useMessages} from '../hooks/useMessages';
 
-const JSONContent: React.FC<{value: TextMessage}> = function ({value}) {
-    return <pre className="bg-body-tertiary p-3 rounded mt-3">{JSON.stringify(value, null, 1)}</pre>;
-};
-
 const TextMessageWidget: React.FC<{msg: TextMessage}> = function ({msg}) {
     return (
-        <div className="shadow-lg">
-            <JSONContent value={msg} />
+        <div className="card shadow-sm m-2">
+            <div className="card-body">
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                    <span className="fw-semibold text-primary">{msg.customer_id}</span>
+                </div>
+                <p className="mb-3 text-body">{msg.body}</p>
+                <div className="text-end text-muted small">{msg.timestamp.toLocaleString()}</div>
+            </div>
         </div>
     );
 };
