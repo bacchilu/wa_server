@@ -1,11 +1,29 @@
 import groupBy from 'lodash/groupBy.js';
 import React from 'react';
+
 import {useMessages} from '../hooks/useMessages';
 
 export type SidebarItem = {
-    id: string;
+    thread_id: string;
     label: string;
     href: string;
+};
+
+const ThreadButton: React.FC<{item: SidebarItem; onClick: () => void; activeThreadId?: string}> = function ({
+    item,
+    onClick,
+    activeThreadId,
+}) {
+    const isActive = activeThreadId !== undefined && item.thread_id === activeThreadId;
+    return (
+        <a
+            href={item.href ?? '#'}
+            className={`nav-link app-sidebar__link${isActive ? ' is-active' : ''}`}
+            onClick={onClick}
+        >
+            {item.label}
+        </a>
+    );
 };
 
 const Sidebar: React.FC<{
@@ -13,16 +31,18 @@ const Sidebar: React.FC<{
     items: SidebarItem[];
     isOpen: boolean;
     onClose: () => void;
-    customerId?: string;
-}> = function ({title, items, isOpen, onClose, customerId}) {
-    console.log(customerId);
-    const handleItemClick = function (item: SidebarItem) {
-        return () => {
+    thread_id?: string;
+}> = function ({title, items, isOpen, onClose, thread_id}) {
+    console.log(thread_id);
+
+    const buttons = items.map((item) => {
+        const handleClick = function () {
             console.log(item);
             onClose();
         };
-    };
 
+        return <ThreadButton key={item.thread_id} item={item} onClick={handleClick} activeThreadId={thread_id} />;
+    });
     return (
         <>
             <aside className={`app-sidebar ${isOpen ? 'is-open' : ''}`}>
@@ -31,18 +51,7 @@ const Sidebar: React.FC<{
                     <button type="button" className="btn-close d-lg-none" aria-label="Close menu" onClick={onClose} />
                 </div>
                 <div className="app-sidebar__body">
-                    <nav className="nav flex-column">
-                        {items.map((item) => (
-                            <a
-                                key={item.id}
-                                href={item.href ?? '#'}
-                                className="nav-link app-sidebar__link"
-                                onClick={handleItemClick(item)}
-                            >
-                                {item.label}
-                            </a>
-                        ))}
-                    </nav>
+                    <nav className="nav flex-column">{buttons}</nav>
                 </div>
             </aside>
             <div className={`app-sidebar__backdrop d-lg-none ${isOpen ? 'is-visible' : ''}`} onClick={onClose} />
@@ -53,8 +62,8 @@ const Sidebar: React.FC<{
 export const MessagesSidebar: React.FC<{
     isSidebarOpen: boolean;
     setSidebarOpen: (v: boolean) => void;
-    customerId?: string;
-}> = function ({isSidebarOpen, setSidebarOpen, customerId}) {
+    thread_id?: string;
+}> = function ({isSidebarOpen, setSidebarOpen, thread_id}) {
     const {data: messages} = useMessages();
 
     const closeSidebar = function () {
@@ -63,7 +72,7 @@ export const MessagesSidebar: React.FC<{
 
     const byCustomer = groupBy(messages, 'customer_id');
     const menuItems: SidebarItem[] = Object.keys(byCustomer).map((customer_id) => ({
-        id: customer_id,
+        thread_id: customer_id,
         label: customer_id,
         href: `#/thread/${customer_id}`,
     }));
@@ -73,7 +82,7 @@ export const MessagesSidebar: React.FC<{
             items={menuItems}
             isOpen={isSidebarOpen}
             onClose={closeSidebar}
-            customerId={customerId}
+            thread_id={thread_id}
         />
     );
 };

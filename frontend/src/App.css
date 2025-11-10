@@ -96,6 +96,19 @@ body {
     color: #212529;
 }
 
+.app-sidebar__link.is-active {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+    font-weight: 600;
+    cursor: default;
+}
+
+.app-sidebar__link.is-active:hover,
+.app-sidebar__link.is-active:focus {
+    color: #0d6efd;
+    background-color: #d7e8ff;
+}
+
 .app-sidebar__backdrop {
     position: fixed;
     inset: 0;

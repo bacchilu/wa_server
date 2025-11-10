@@ -14,7 +14,7 @@ const CenteredState: React.FC<{children: React.ReactNode}> = function ({children
     return <div className="app-empty-state">{children}</div>;
 };
 
-const AppShell: React.FC<{activeCustomerId?: string}> = function ({activeCustomerId}) {
+const AppShell: React.FC<{active_thread_id?: string}> = function ({active_thread_id}) {
     const {data: messages, error} = useMessages();
     const [isSidebarOpen, setSidebarOpen] = React.useState(true);
 
@@ -44,9 +44,9 @@ const AppShell: React.FC<{activeCustomerId?: string}> = function ({activeCustome
             <MessagesSidebar
                 isSidebarOpen={isSidebarOpen}
                 setSidebarOpen={setSidebarOpen}
-                customerId={activeCustomerId}
+                thread_id={active_thread_id}
             />
-            {activeCustomerId === undefined ? <MainPanel /> : <ThreadPanel customerId={activeCustomerId} />}
+            {active_thread_id === undefined ? <MainPanel /> : <ThreadPanel customerId={active_thread_id} />}
         </div>
     );
 };
@@ -61,14 +61,14 @@ const Home = function () {
 };
 
 const ThreadPage = function () {
-    const params = useParams<{customer_id: string}>();
-    const customerId = params.customer_id;
+    const params = useParams<{thread_id: string}>();
+    const thread_id = params.thread_id;
 
-    if (customerId === undefined) return <Navigate to="/" replace />;
+    if (thread_id === undefined) return <Navigate to="/" replace />;
     return (
         <div className="app-root">
             <Navbar />
-            <AppShell activeCustomerId={customerId} />
+            <AppShell active_thread_id={thread_id} />
         </div>
     );
 };
@@ -89,7 +89,7 @@ export const App = function () {
     return (
         <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/thread/:customer_id" element={<ThreadPage />} />
+            <Route path="/thread/:thread_id" element={<ThreadPage />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
     );
