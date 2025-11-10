@@ -46,7 +46,7 @@ const AppShell: React.FC<{active_thread_id?: string}> = function ({active_thread
                 setSidebarOpen={setSidebarOpen}
                 thread_id={active_thread_id}
             />
-            {active_thread_id === undefined ? <MainPanel /> : <ThreadPanel customerId={active_thread_id} />}
+            {active_thread_id === undefined ? <MainPanel /> : <ThreadPanel thread_id={active_thread_id} />}
         </div>
     );
 };

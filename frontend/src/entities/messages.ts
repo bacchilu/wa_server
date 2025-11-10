@@ -1,5 +1,10 @@
+export enum MessageType {
+    Text = 'text',
+    Unknown = 'unknown',
+}
+
 export interface TextMessage {
-    type: 'text';
+    type: MessageType.Text;
     customer_id: string;
     id: string;
     timestamp: Date;
@@ -7,7 +12,7 @@ export interface TextMessage {
 }
 
 interface UnknownMessage {
-    type: 'unknown';
+    type: MessageType.Unknown;
     raw: Record<string, unknown>;
 }
 

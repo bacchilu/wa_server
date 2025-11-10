@@ -33,16 +33,9 @@ const Sidebar: React.FC<{
     onClose: () => void;
     thread_id?: string;
 }> = function ({title, items, isOpen, onClose, thread_id}) {
-    console.log(thread_id);
-
-    const buttons = items.map((item) => {
-        const handleClick = function () {
-            console.log(item);
-            onClose();
-        };
-
-        return <ThreadButton key={item.thread_id} item={item} onClick={handleClick} activeThreadId={thread_id} />;
-    });
+    const buttons = items.map((item) => (
+        <ThreadButton key={item.thread_id} item={item} onClick={onClose} activeThreadId={thread_id} />
+    ));
     return (
         <>
             <aside className={`app-sidebar ${isOpen ? 'is-open' : ''}`}>

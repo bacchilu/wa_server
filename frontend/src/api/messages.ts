@@ -1,17 +1,20 @@
 import axios from 'axios';
 import {z, ZodError} from 'zod';
 
-import type {Message} from '../entities/messages';
+import {MessageType, type Message} from '../entities/messages';
 
 const TextMessageSchema = z.object({
-    type: z.literal('text'),
+    type: z.literal(MessageType.Text),
     customer_id: z.string(),
     id: z.string(),
     timestamp: z.coerce.date(),
     body: z.string(),
 });
 
-const UnknownMessageSchema = z.object({type: z.literal('unknown'), raw: z.record(z.string(), z.unknown())});
+const UnknownMessageSchema = z.object({
+    type: z.literal(MessageType.Unknown),
+    raw: z.record(z.string(), z.unknown()),
+});
 
 const MessageSchema: z.ZodType<Message> = z.union([
     TextMessageSchema,
