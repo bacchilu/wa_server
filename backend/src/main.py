@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .routes.auth import router as auth_router
 from .routes.messages import router as messages
 from .routes.webhook import router as webhook_router
 
@@ -10,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 app = FastAPI()
+app.include_router(auth_router)
 app.include_router(webhook_router)
 app.include_router(messages)
 app.add_middleware(

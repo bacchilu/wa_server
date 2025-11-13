@@ -1,3 +1,3 @@
-__all__ = ["messages", "webhook"]
+__all__ = ["auth", "messages", "webhook"]
 
-from . import messages, webhook
+from . import auth, messages, webhook
