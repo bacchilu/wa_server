@@ -5,7 +5,7 @@
   "scripts": {
     "update": "ncu -u",
     "lt": "lt --port 8000",
-    "python:dev": "python3 -m venv ENV && ENV/bin/pip3 install -r requirements.txt && ENV/bin/fastapi dev src/routes/main.py",
+    "python:dev": "python3 -m venv ENV && ENV/bin/pip3 install -r requirements.txt && ENV/bin/fastapi dev src/main.py",
     "python:prune": "rm -rf ENV && find . -name *.pyc -delete && find . -name __pycache__ -delete"
   },
   "author": "",

@@ -3,8 +3,8 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .messages import router as messages
-from .webhook import router as webhook_router
+from .routes.messages import router as messages
+from .routes.webhook import router as webhook_router
 
 logging.basicConfig(level=logging.INFO)
 

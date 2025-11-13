@@ -25,7 +25,7 @@ services:
         USER_ID: ${USER_ID}
         GROUP_ID: ${GROUP_ID}
     expose: ["8000"]
-    command: fastapi run src/routes/main.py --host 0.0.0.0
+    command: fastapi run src/main.py --host 0.0.0.0
   queue_consumer:
     build:
       context: ../queue-consumer
