@@ -204,3 +204,27 @@ body {
 .card {
     border-radius: 1rem;
 }
+
+.auth-page {
+    min-height: 50vh;
+    background: radial-gradient(circle at top, #fdf2ff, #f8f9fa 55%);
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.auth-page__panel {
+    width: min(420px, 100%);
+    background-color: #ffffff;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    box-shadow: 0 1.5rem 3rem rgba(33, 37, 41, 0.15);
+}
+
+.auth-page__intro h1 {
+    font-weight: 600;
+}
+
+.auth-page__form .btn-lg {
+    padding-block: 0.85rem;
+}
