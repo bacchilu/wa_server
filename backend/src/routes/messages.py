@@ -1,3 +1,5 @@
+__all__ = ["router"]
+
 import logging
 
 from fastapi import APIRouter
